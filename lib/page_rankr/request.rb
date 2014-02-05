@@ -12,7 +12,11 @@ module PageRankr
       url = tracker.url
 
       response = HTTParty.send(method, url, construct_options(tracker))
-      yield response.body if block_given?
+      if response.success?
+        yield response.body if block_given?
+      else
+        raise PageRankr::RequestThrottled, 'Request was throttled by tracker'
+      end
     end
 
   private
